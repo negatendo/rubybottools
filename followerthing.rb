@@ -4,18 +4,17 @@
 # follow/unfollow actions
 
 require 'twitter'
+require_relative 'twurlrc-reader.rb'
 
-# the delay between all actions performed on api
-# we are nice to twitter. so nice. that's why this
-# follower thing works, you see.
+# the delay between the refresh_follower crawlers actions
 $twitter_client_delay = 5
 
 class FollowerThing
   attr_accessor :client
 
-  attr_reader :follow_parity_running
+  attr_reader :all_followers, :all_following
 
-  def initialize(client, username = nil)
+  def initialize(client, username = false, skip_refresh = false)
     # FEED ME TWITTER CLIENT and optional username to eat
     @client = client
     if !username
@@ -25,22 +24,44 @@ class FollowerThing
 
     # take back the user
     @username = username
+
+    # set up all followers and following - this takes a while!
+    # so you can skip it and manually call refresh_followers later ok?
+    @all_following = Array.new
+    @all_followers = Array.new
+    if !skip_refresh
+      self.refresh_followers
+    end
+  end
+
+  def refresh_followers
+    @all_following = self.crawl_all_following
+    @all_followers = self.crawl_all_followers
+  end
+
+  def crawl_all_following
+    @client.following.each do |x|
+      puts "Info: following #{x.screen_name}"
+      @all_following << x.screen_name
+      sleep(@delay)
+    end
+  end
+
+  def crawl_all_followers
+    @client.followers.each do |x|
+      puts "Info: followed by #{x.screen_name}"
+      @all_followers << x.screen_name
+      sleep(@delay)
+    end
   end
 
   def follow_parity
-
-    if @last_command_running
-      raise "A FollowerThing command is already running. Try again later."
-    end
-
-    @last_command_running = true
     self.unfollow_non_followers
     self.followback
-    @last_command_running = false
   end
 
   def unfollow_non_followers
-    @client.following.each do |x|
+    @all_followers.each do |x|
       if !x.following?
         @client.unfollow(x)
         puts "Unfollowed #{x.screen_name}"
@@ -50,7 +71,7 @@ class FollowerThing
   end
 
   def followback
-    @client.followers.each do |x|
+    @all_followers.each do |x|
       if x.following?
         @client.follow(x)
         puts "Followed #{x.screen_name}"
@@ -60,7 +81,7 @@ class FollowerThing
   end
 
   def unfollow_all
-    @client.following.each do |x|
+    @all_following.each do |x|
       @client.unfollow(x)
       puts "Unfollowed #{x.screen_name}"
       sleep(@delay)
@@ -75,15 +96,22 @@ class FollowerThing
     end
   end
 
+  def unfollow_array(usernames = Array.new())
+    usernames.each do |x|
+      @client.follow(x)
+      puts "Followed #{x}"
+      sleep(@delay)
+    end
+  end
+
 end
 
-# YUMMY EXAMPLE
+# EXAMPLE
 # Protip: use Thread class to multithread
-#client = Twitter::REST::Client.new do |config|
-#  config.consumer_key        = ""
-#  config.consumer_secret     = ""
-#  config.access_token        = ""
-#  config.access_token_secret = ""
-#end
-#x = FollowerThing.new(client,'negatendo')
-#x.follow_array(['twitter','logoninternet'])
+# init takes a long time as it loads up all your followers/following
+
+
+account = TwurlrcReader.new('MarbleckaeYumte','lN1fHeFIm7LTAKQYV03DDpVNO')
+client = account.get_rest_client()
+x = FollowerThing.new(client,'negatendo')
+x.follow_array(['twitter','logoninternet'])
