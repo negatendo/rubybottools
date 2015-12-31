@@ -6,6 +6,8 @@ class Spaceinator
   #different wacky unicode spaces - good for "seeecret padding"
   #of tweets to avoid duplicates/manager char limits
 
+  #TODO: substitute spaces in a string
+
   attr_reader :spaces
 
   def initialize( )
