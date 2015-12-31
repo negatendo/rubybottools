@@ -4,14 +4,19 @@ require 'yaml'
 require 'twitter'
 
 class TwurlrcReader
-  #provide me username and consumer key and i'll return all the good stuff
+  # provide me username and consumer key and i'll return all the good stuff
+  # from a twurl rc file. see https://github.com/kurrik/twurlrc
 
   attr_reader :username, :consumer_key, :consumer_secret, :access_token, :access_token_secret
 
   attr_accessor :client
 
-  def initialize(username, consumer_key)
-    @path = ENV['HOME']+'/.twurlrc'
+  def initialize(username, consumer_key, path = false)
+    if path
+      @path = path
+    else
+      @path = ENV['HOME']+'/.twurlrc'
+    end
     @username = username
     @consumer_key = consumer_key
     #load our yaml and set rest of class variables
