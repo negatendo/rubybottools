@@ -111,7 +111,7 @@ end
 # init takes a long time as it loads up all your followers/following
 
 
-account = TwurlrcReader.new('MarbleckaeYumte','lN1fHeFIm7LTAKQYV03DDpVNO')
-client = account.get_rest_client()
-x = FollowerThing.new(client,'negatendo')
-x.follow_array(['twitter','logoninternet'])
+#account = TwurlrcReader.new('MarbleckaeYumte','lN1fHeFIm7LTAKQYV03DDpVNO')
+#client = account.get_rest_client()
+#x = FollowerThing.new(client,'negatendo')
+#x.follow_array(['twitter','logoninternet'])
