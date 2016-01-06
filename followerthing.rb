@@ -7,7 +7,7 @@ require 'twitter'
 require_relative 'twurlrc-reader.rb'
 
 # the delay between the refresh_follower crawlers actions
-$twitter_client_delay = 5
+$twitter_client_delay = 2
 
 class FollowerThing
   attr_accessor :client
@@ -40,6 +40,7 @@ class FollowerThing
   end
 
   def crawl_all_following
+    puts "Info: Collecting following..."
     @client.following.each do |x|
       puts "Info: following #{x.screen_name}"
       @all_following << x.screen_name
@@ -48,6 +49,7 @@ class FollowerThing
   end
 
   def crawl_all_followers
+    puts "Info: Collecting followers..."
     @client.followers.each do |x|
       puts "Info: followed by #{x.screen_name}"
       @all_followers << x.screen_name
@@ -61,7 +63,8 @@ class FollowerThing
   end
 
   def unfollow_non_followers
-    @all_followers.each do |x|
+    @all_following.each do |x|
+      puts "Checking if #{x.screen_name} still follows"
       if !x.following?
         @client.unfollow(x)
         puts "Unfollowed #{x.screen_name}"
@@ -72,9 +75,10 @@ class FollowerThing
 
   def followback
     @all_followers.each do |x|
-      if x.following?
+      puts "Checking if I follow #{x.screen_name}"
+      if !x.following?
         @client.follow(x)
-        puts "Followed #{x.screen_name}"
+        puts "Followed-back #{x.screen_name}"
       end
       sleep(@delay)
     end
@@ -113,5 +117,5 @@ end
 
 #account = TwurlrcReader.new('MarbleckaeYumte','lN1fHeFIm7LTAKQYV03DDpVNO')
 #client = account.get_rest_client()
-#x = FollowerThing.new(client,'negatendo')
-#x.follow_array(['twitter','logoninternet'])
+#x = FollowerThing.new(client)
+#x.follow_parity
