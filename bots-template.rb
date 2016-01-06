@@ -1,5 +1,7 @@
 require 'twitter_ebooks'
 
+# TODO steal from Slam140-2
+
 require_relative 'rubybottools/twurlrc-reader.rb'
 require_relative 'rubybottools/botsession.rb'
 

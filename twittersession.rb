@@ -1,7 +1,9 @@
 #!/usr/bin/ruby
 
+require 'psstore'
+
 class TwitterSession
-  # thingy to track simple data about interaction sessions
+  # thingy to track persistant data about interaction sessions
   # with other users
 
   attr_reader :data #data will contain the ... data
