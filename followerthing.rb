@@ -1,26 +1,32 @@
 #!/usr/bin/ruby
 
 # thingy to gather information about followers and perform
-# follow/unfollow actions
+# follow/unfollow actions (for the client's user account)
 
 require 'twitter'
 require_relative 'twurlrc-reader.rb'
 
-# the delay between the refresh_follower crawlers actions
-$twitter_client_delay = 2
+# the default delay between the refresh_follower crawlers actions
+$twitter_client_delay = 10
 
 class FollowerThing
   attr_accessor :client
 
   attr_reader :all_followers, :all_following
 
-  def initialize(client, username = false, skip_refresh = false)
+  def initialize(client, username = false, skip_refresh = false, delay = 0)
+    # customize delay
+    if delay == 0
+      @delay = $twitter_client_delay
+    else
+      @delay = delay
+    end
+
     # FEED ME TWITTER CLIENT and optional username to eat
     @client = client
     if !username
       username = client.user.screen_name
     end
-    @delay = $twitter_client_delay
 
     # take back the user
     @username = username
@@ -29,7 +35,7 @@ class FollowerThing
     # so you can skip it and manually call refresh_followers later ok?
     @all_following = Array.new
     @all_followers = Array.new
-    if !skip_refresh
+    unless skip_refresh
       self.refresh_followers
     end
   end
@@ -117,5 +123,5 @@ end
 
 #account = TwurlrcReader.new('MarbleckaeYumte','lN1fHeFIm7LTAKQYV03DDpVNO')
 #client = account.get_rest_client()
-#x = FollowerThing.new(client)
+#x = FollowerThing.new(client, username = false, skip_refresh = false, delay = 20)
 #x.follow_parity
