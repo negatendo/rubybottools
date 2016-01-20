@@ -1,60 +1,44 @@
 # encoding: utf-8
 #!/usr/bin/ruby
 
-#TODO: make me work on json files with more than one property
-
-require 'linguistics'
 require 'json'
 
 class CorporaGulp
-  #simple corpora json iterator with pluralizer and maybe other things
-
-  attr_reader :data #data will contain the ... data
+  # thing to navigate and assemble corpora data
+  # see: https://github.com/dariusk/corpora
 
   Linguistics.use( :en )
 
-  def initialize(path,resource)
-    #corpora dir + rest of path to json
-    @full_path = path + "data" + resource + ".json"
-    #read in raw data
-    @data = JSON.parse(File.read(@full_path))
-    @iterators = {} #shifted arrays of each iterated property
-  end
+  attr_reader :data_dir, :data
 
-  def get_next( property, pluralize )
-    #see if already tracking this property
-    if !@iterators.include? property
-      @iterators[property] = @data[ property ]
-    end
-    return @iterators["vegetables"].shift
-  end
-
-  def get_all(property,pluralize)
-  end
-
-  def get_random( property, pluralize )
-    #random specified property from data
-    sample = @data[property].sample
-    if pluralize
-      return sample.en.plural
+  def initialize
+    # make sure we have our data directory availabe
+    if !File.directory? (File.dirname(__FILE__) + '/corpora')
+      puts "Corpora not found. Did you init submodules?"
+      exit
     else
-      return sample
+      @data_dir = File.dirname(__FILE__) + '/corpora/data/'
     end
+  end
+
+  def load( folder, filename, property )
+    # loads into this object's data array the
+    # property data specified in the folder and filename.json
+    file = JSON.parse(File.read(@data_dir + folder + '/' + filename))
+    @data = file[property]
+  end
+
+  def get_all
+    return @data
+  end
+
+  def get_random
+    return @data.sample
   end
 
 end
 
 
-#vegetables = CorporaGulp.new('/home/bretto/Documents/corpora/','/foods/vegetables')
-#puts vegetables.data
-#i = 0
-#while i < 100 do
-#  i += 1
-#  veg = vegetables.get_next('vegetables',true)
-#  if veg
-#    puts veg
-#  else
-#    exit
-#  end
-#end
-#puts vegetables.get_random('vegetables',true)
+#x = CorporaGulp.new
+#x.load('animals','dogs.json','dogs')
+#puts x.get_random
