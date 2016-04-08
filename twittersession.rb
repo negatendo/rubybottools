@@ -74,8 +74,9 @@ class TwitterSessionUser
     end
   end
 
+  # time logged is time since the great unix epoch PRAISE THE KERNEL
   def log_time
-    @last_interaction_time = Time.now.getutc
+    @last_interaction_time = Time.now.to_i
   end
 
   def get_data_array
